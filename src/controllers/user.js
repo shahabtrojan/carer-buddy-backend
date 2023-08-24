@@ -115,6 +115,7 @@ const add_interest = async (req, res) => {
       });
 
     user.interests = req.body.interests;
+    user = await user.save();
 
     return res.status(200).json({
       code: 200,
@@ -138,6 +139,7 @@ const add_location = async (req, res) => {
       });
 
     user.locations = req.body.locations;
+    user = await user.save();
 
     return res.status(200).json({
       code: 200,
@@ -161,6 +163,7 @@ const add_disease = async (req, res) => {
       });
 
     user.diseases = req.body.diseases;
+    user = await user.save();
 
     return res.status(200).json({
       code: 200,
