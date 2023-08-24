@@ -9,6 +9,7 @@ const {
   add_interest,
   add_location,
   add_disease,
+  edit_profile,
 } = require("../controllers/user");
 
 const auth = require("../middleware/authenticate");
@@ -20,5 +21,6 @@ router.route("/profile").get(auth, get_profile);
 router.route("/interest").post(auth, add_interest);
 router.route("/location").post(auth, add_location);
 router.route("/disease").post(auth, add_disease);
+router.route("/edit_profile").post(auth, edit_profile);
 
 module.exports = router;

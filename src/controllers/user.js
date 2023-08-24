@@ -173,6 +173,31 @@ const add_disease = async (req, res) => {
   }
 };
 
+const edit_profile = async (req, res) => {
+  try {
+    var user = await User.findById(req.user._id).select("-password");
+
+    if (!user)
+      return res.status(404).json({
+        code: 404,
+        message: "User not found",
+      });
+
+    user.first_name = req.body.first_name;
+    user.last_name = req.body.last_name;
+    await user.save();
+
+    return res.status(200).json({
+      code: 200,
+      message: "Profile updated successfully",
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
 module.exports = {
   signup,
   login_user,
@@ -180,4 +205,5 @@ module.exports = {
   add_interest,
   add_location,
   add_disease,
+  edit_profile,
 };
