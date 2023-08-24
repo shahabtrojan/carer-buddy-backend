@@ -19,7 +19,16 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     interests: [],
-    locations: [],
+    locations: {
+      longitude: {
+        type: String,
+        default: "",
+      },
+      latitude: {
+        type: String,
+        default: "",
+      },
+    },
     diseases: [],
     image: {
       type: String,
