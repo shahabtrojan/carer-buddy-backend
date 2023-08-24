@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
     interests: [],
     locations: [],
     diseases: [],
+    image: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
