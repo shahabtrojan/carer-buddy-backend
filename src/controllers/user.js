@@ -200,6 +200,27 @@ const edit_profile = async (req, res) => {
   }
 };
 
+// feed api in which every tiome user login it will show the feed of the user
+
+const feed = async (req, res) => {
+  try {
+    // get random users  every time user login
+
+    var users = await User.find({
+      _id: { $ne: req.user._id },
+    }).select("-password");
+
+    res.status(200).json({
+      code: 200,
+      message: "success",
+      users: users,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
 module.exports = {
   signup,
   login_user,
@@ -208,4 +229,5 @@ module.exports = {
   add_location,
   add_disease,
   edit_profile,
+  feed,
 };
