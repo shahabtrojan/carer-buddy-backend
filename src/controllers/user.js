@@ -186,6 +186,7 @@ const edit_profile = async (req, res) => {
     user.first_name = req.body.first_name;
     user.last_name = req.body.last_name;
     user.image = req.body.image;
+    user.gender = req.body.gender;
     await user.save();
 
     return res.status(200).json({
