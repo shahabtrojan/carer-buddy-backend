@@ -94,10 +94,17 @@ const get_profile = async (req, res) => {
         message: "User not found",
       });
 
+    // find users which i requested
+
+    var requested_users = await User.find({
+      "message_request.requested_by": req.user._id,
+    }).select("-password");
+
     return res.status(200).json({
       code: 200,
       message: "success",
       user: user,
+      requested_users: requested_users,
     });
   } catch (error) {
     console.log(error);
@@ -265,7 +272,7 @@ const request_message = async (req, res) => {
     // send the request
 
     user.message_request.push({
-      requested_by: req.params.id,
+      requested_by: req.user._id,
       requested_status: "pending",
     });
 
