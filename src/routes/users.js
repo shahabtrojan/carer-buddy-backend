@@ -15,6 +15,7 @@ const {
   accept_request,
   get_requests,
   get_predictions,
+  get_profile_by_id,
 } = require("../controllers/user");
 
 const auth = require("../middleware/authenticate");
@@ -32,5 +33,6 @@ router.route("/request_message/:id").get(auth, request_message);
 router.route("/accept_request/:id").post(auth, accept_request);
 router.route("/get_requests").get(auth, get_requests);
 router.route("/get_predictions").post(auth, get_predictions);
+router.route("/get_profile_by_id/:id").get(auth, get_profile_by_id);
 
 module.exports = router;

@@ -126,6 +126,32 @@ const get_profile = async (req, res) => {
   }
 };
 
+const get_profile_by_id = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select("-password")
+      .populate(
+        "message_request.requested_by",
+        "first_name last_name image email"
+      );
+
+    if (!user)
+      return res.status(404).json({
+        code: 404,
+        message: "User not found",
+      });
+
+    return res.status(200).json({
+      code: 200,
+      message: "success",
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
 const add_interest = async (req, res) => {
   try {
     var user = await User.findById(req.user._id).select("-password");
@@ -416,4 +442,5 @@ module.exports = {
   accept_request,
   get_requests,
   get_predictions,
+  get_profile_by_id,
 };
