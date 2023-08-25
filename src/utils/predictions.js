@@ -1,7 +1,7 @@
 const axios = require("axios");
 
-var model_server = "http://localhost:5000/predict";
-var test_server = "http://localhost:5000/test";
+var model_server = "http://localhost:6464/predict";
+var test_server = "http://localhost:6464/test";
 
 const predict = async (data) => {
   try {
