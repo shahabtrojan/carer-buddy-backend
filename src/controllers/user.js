@@ -190,6 +190,7 @@ const edit_profile = async (req, res) => {
     user.last_name = req.body.last_name;
     user.image = req.body.image;
     user.gender = req.body.gender;
+    user.contact_number = req.body.contact_number;
     user = await user.save();
 
     return res.status(200).json({
@@ -224,6 +225,145 @@ const feed = async (req, res) => {
   }
 };
 
+const request_message = async (req, res) => {
+  try {
+    // get the user who is sending the request
+
+    var user = await User.findById(req.user._id).select("-password");
+
+    if (!user)
+      return res.status(404).json({
+        code: 404,
+        message: "User not found",
+      });
+
+    // get the user who is receiving the request
+
+    var requested_user = await User.findById(req.params.id).select("-password");
+
+    if (!requested_user)
+      return res.status(404).json({
+        code: 404,
+        message: "User not found",
+      });
+
+    // check if the user is already requested
+
+    var check_request = user.message_request.filter(
+      (item) => item.requested_by.toString() === req.params.id.toString()
+    );
+
+    if (check_request.length > 0) {
+      return res.status(400).json({
+        code: 400,
+        message: "Request already sent",
+      });
+    }
+
+    // send the request
+
+    user.message_request.push({
+      requested_by: req.params.id,
+      requested_status: "pending",
+    });
+
+    user = await user.save();
+
+    return res.status(200).json({
+      code: 200,
+      message: "Request sent successfully",
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+const accept_request = async (req, res) => {
+  try {
+    // get the user who is sending the request
+
+    var user = await User.findById(req.user._id).select("-password");
+
+    if (!user)
+      return res.status(404).json({
+        code: 404,
+        message: "User not found",
+      });
+
+    // get the user who is receiving the request
+
+    var requested_user = await User.findById(req.params.id).select("-password");
+
+    if (!requested_user)
+      return res.status(404).json({
+        code: 404,
+        message: "User not found",
+      });
+
+    // check if the user is already requested
+
+    var check_request = user.message_request.filter(
+      (item) => item.requested_by.toString() === req.params.id.toString()
+    );
+
+    if (check_request.length === 0) {
+      return res.status(400).json({
+        code: 400,
+        message: "Request not found",
+      });
+    }
+
+    // send the request
+
+    user.message_request.map((item) => {
+      if (item.requested_by.toString() === req.params.id.toString()) {
+        item.requested_status = req.body.status;
+      }
+    });
+
+    user = await user.save();
+
+    return res.status(200).json({
+      code: 200,
+      message: `Request ${req.body.status} successfully`,
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+const get_requests = async (req, res) => {
+  try {
+    // get the user who is sending the request
+
+    var user = await User.findById(req.user._id)
+      .select("-password")
+      .populate(
+        "message_request.requested_by",
+        "first_name last_name image email"
+      );
+
+    if (!user)
+      return res.status(404).json({
+        code: 404,
+        message: "User not found",
+      });
+
+    return res.status(200).json({
+      code: 200,
+      message: "success",
+      requests: user?.message_request ?? [],
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
 module.exports = {
   signup,
   login_user,
@@ -233,4 +373,7 @@ module.exports = {
   add_disease,
   edit_profile,
   feed,
+  request_message,
+  accept_request,
+  get_requests,
 };

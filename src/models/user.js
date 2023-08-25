@@ -38,6 +38,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    contact_number: {
+      type: String,
+      default: "",
+    },
+
+    message_request: [
+      {
+        requested_by: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+
+        requested_status: {
+          type: String,
+          default: "pending",
+          enum: ["pending", "accepted", "rejected"],
+        },
+      },
+    ],
   },
   {
     timestamps: true,
