@@ -43,6 +43,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    cluster_id: {
+      type: Number,
+      default: 0,
+    },
+
+    profile_completed: {
+      type: Boolean,
+      default: false,
+    },
 
     message_request: [
       {
