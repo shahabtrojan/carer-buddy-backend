@@ -192,6 +192,7 @@ const edit_profile = async (req, res) => {
     user.image = req.body.image;
     user.gender = req.body.gender;
     user.contact_number = req.body.contact_number;
+    user.profile_completed = req.body.profile_completed;
     user = await user.save();
 
     return res.status(200).json({
