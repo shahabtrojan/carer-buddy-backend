@@ -86,7 +86,12 @@ const login_user = async (req, res) => {
 
 const get_profile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(req.user._id)
+      .select("-password")
+      .populate(
+        "message_request.requested_by",
+        "first_name last_name image email"
+      );
 
     if (!user)
       return res.status(404).json({
@@ -104,7 +109,8 @@ const get_profile = async (req, res) => {
       code: 200,
       message: "success",
       user: user,
-      requested_users: requested_users,
+      requested_by: user.message_request,
+      my_requested_users: requested_users,
     });
   } catch (error) {
     console.log(error);
@@ -259,7 +265,7 @@ const request_message = async (req, res) => {
     // check if the user is already requested
 
     var check_request = user.message_request.filter(
-      (item) => item.requested_by.toString() === req.params.id.toString()
+      (item) => item.requested_by.toString() === req.user._id.toString()
     );
 
     if (check_request.length > 0) {
@@ -271,10 +277,12 @@ const request_message = async (req, res) => {
 
     // send the request
 
-    user.message_request.push({
+    requested_user.message_request.push({
       requested_by: req.user._id,
       requested_status: "pending",
     });
+
+    requested_user = await requested_user.save();
 
     user = await user.save();
 
