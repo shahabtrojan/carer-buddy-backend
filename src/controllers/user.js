@@ -56,7 +56,10 @@ const login_user = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    var user = await User.findOne({ email: email });
+    var user = await User.findOne({ email: email }).populate(
+      "message_request.requested_by",
+      "first_name last_name image email"
+    );
     if (!user)
       return res.status(400).json({
         code: 400,
@@ -72,11 +75,16 @@ const login_user = async (req, res) => {
 
     const token = user.generateAuthToken();
 
+    var requested_users = await User.find({
+      "message_request.requested_by": user._id,
+    }).select("-password");
+
     res.status(200).json({
       code: 200,
       message: "Login Successfull",
       token: token,
       user: user,
+      my_requested_users: requested_users,
     });
   } catch (error) {
     console.log(error);
