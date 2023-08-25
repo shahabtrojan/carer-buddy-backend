@@ -14,6 +14,7 @@ const {
   request_message,
   accept_request,
   get_requests,
+  get_predictions,
 } = require("../controllers/user");
 
 const auth = require("../middleware/authenticate");
@@ -30,5 +31,6 @@ router.route("/feed").get(auth, feed);
 router.route("/request_message/:id").get(auth, request_message);
 router.route("/accept_request/:id").post(auth, accept_request);
 router.route("/get_requests").get(auth, get_requests);
+router.route("/get_predictions").post(auth, get_predictions);
 
 module.exports = router;

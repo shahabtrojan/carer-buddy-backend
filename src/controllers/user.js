@@ -1,5 +1,6 @@
 const { User, validate_signuo } = require("../models/user");
 const bcrypt = require("bcrypt");
+const { predict } = require("../utils/predictions");
 const signup = async (req, res) => {
   try {
     const { error } = validate_signuo(req.body);
@@ -364,6 +365,20 @@ const get_requests = async (req, res) => {
   }
 };
 
+const get_predictions = async (req, res) => {
+  try {
+    const predictions = await predict(req.body);
+    return res.status(200).json({
+      code: 200,
+      message: "success",
+      predictions: predictions,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
+
 module.exports = {
   signup,
   login_user,
@@ -376,4 +391,5 @@ module.exports = {
   request_message,
   accept_request,
   get_requests,
+  get_predictions,
 };

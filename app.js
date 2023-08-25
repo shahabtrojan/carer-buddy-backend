@@ -6,6 +6,23 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 
+var { exec } = require("child_process");
+
+// execute python script
+
+exec("python3 ./main.py", (err, stdout, stderr) => {
+  console.log("executing python script");
+  if (err) {
+    console.log(`error: ${err.message}`);
+    return;
+  }
+  if (stderr) {
+    console.log(`stderr: ${stderr}`);
+    return;
+  }
+  console.log(`stdout: ${stdout}`);
+});
+
 var indexRouter = require("./src/routes/index");
 var usersRouter = require("./src/routes/users");
 
