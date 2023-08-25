@@ -19,6 +19,7 @@ const {
 } = require("../controllers/user");
 
 const auth = require("../middleware/authenticate");
+const { checkParameter } = require("../middleware/check_params");
 
 router.route("/signup").post(signup);
 router.route("/login").post(login_user);
@@ -29,10 +30,16 @@ router.route("/location").post(auth, add_location);
 router.route("/disease").post(auth, add_disease);
 router.route("/edit_profile").post(auth, edit_profile);
 router.route("/feed").get(auth, feed);
-router.route("/request_message/:id").get(auth, request_message);
-router.route("/accept_request/:id").post(auth, accept_request);
+router
+  .route("/request_message/:id")
+  .get(auth, checkParameter("id"), request_message);
+router
+  .route("/accept_request/:id")
+  .post(auth, checkParameter("id"), accept_request);
 router.route("/get_requests").get(auth, get_requests);
 router.route("/get_predictions").post(auth, get_predictions);
-router.route("/get_profile_by_id/:id").get(auth, get_profile_by_id);
+router
+  .route("/get_profile_by_id/:id")
+  .get(auth, checkParameter("id"), get_profile_by_id);
 
 module.exports = router;

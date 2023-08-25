@@ -94,7 +94,7 @@ const login_user = async (req, res) => {
 
 const get_profile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id)
+    var user = await User.findById(req.user._id)
       .select("-password")
       .populate(
         "message_request.requested_by",
@@ -112,6 +112,36 @@ const get_profile = async (req, res) => {
     var requested_users = await User.find({
       "message_request.requested_by": req.user._id,
     }).select("-password");
+
+    // predict the cluster of the user based on the interests, diseases gender if profile is completed
+
+    // if (user.profile_completed) {
+    //   {
+    //     "status": "",
+    //     "sex": "",
+    //     "disease_1": "",
+    //     "interest_1": "",
+    //     "disease_2": "",
+    //     "interest_2": "",
+    //     "disease_3": "",
+    //     "interest_3": ""
+    // }
+    var data_to_pass = {
+      interest_1: user.interests[0] ?? "music",
+      interest_2: user.interests[1] ?? "music",
+      interest_3: user.interests[2] ?? "music",
+      disease_1: user.diseases[0] ?? "none",
+      disease_2: user.diseases[1] ?? "none",
+      disease_3: user.diseases[2] ?? "none",
+      status: user.status ?? "single",
+      sex: user.gender ?? "m",
+    };
+    var predictions = await predict(data_to_pass);
+    console.log(predictions);
+    user.cluster_id = predictions[0];
+    console.log(user);
+    user = await user.save();
+    // }
 
     return res.status(200).json({
       code: 200,
@@ -263,10 +293,17 @@ const feed = async (req, res) => {
       _id: { $ne: req.user._id },
     }).select("-password");
 
+    // find users which cluster id is same as the user
+
+    var cluster_users = await User.find({
+      cluster_id: req.user.cluster_id,
+    }).select("-password");
+
     res.status(200).json({
       code: 200,
       message: "success",
       users: users,
+      cluster_users: cluster_users,
     });
   } catch (error) {
     console.log(error);
