@@ -520,6 +520,8 @@ const insert_fake_data = async (req, res) => {
       "complicated",
     ];
 
+    var gender = ["m", "f"];
+
     for (let index = 0; index < 100; index++) {
       var user = await generate_fake_data();
 
@@ -531,7 +533,7 @@ const insert_fake_data = async (req, res) => {
         disease_2: user.diseases[1] ?? "none",
         disease_3: user.diseases[2] ?? "none",
         status: status[Math.floor(Math.random() * status.length)],
-        sex: user.gender,
+        sex: gender[[Math.floor(Math.random() * status.length)]],
       };
 
       var predictions = await predict(data_to_pass);
