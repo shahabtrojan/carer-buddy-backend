@@ -299,7 +299,7 @@ const feed = async (req, res) => {
       cluster_id: req.user.cluster_id,
     }).select("-password");
 
-    cluster_users = cluster_users.concat(users);
+    // cluster_users = cluster_users.concat(users);
 
     if (
       !!req.body.latitude &&
