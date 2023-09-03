@@ -308,40 +308,42 @@ const feed = async (req, res) => {
 
     // cluster_users = cluster_users.concat(users);
 
-    if (
-      !!req.body.latitude &&
-      !!req.body.longitude &&
-      req.body.latitude !== "" &&
-      req.body.longitude !== ""
-    ) {
-      const yourLatitude = req.body.latitude;
-      const yourLongitude = req.body.longitude;
-      const maxDistanceMeters = 10000;
+    // if (
+    //   !!req.body.latitude &&
+    //   !!req.body.longitude &&
+    //   req.body.latitude !== "" &&
+    //   req.body.longitude !== ""
+    // ) {
+    const yourLatitude = req.body.latitude ?? req.user.locations.latitude ?? "";
+    const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
+    const maxDistanceMeters = 10000;
 
-      // Find users within 1000 meters of the specified latitude and longitude
-      var near_by = await User.find({
-        $and: [
-          { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
-          { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
-          {
-            locations: {
-              $geoWithin: {
-                $centerSphere: [
-                  [yourLongitude, yourLatitude],
-                  maxDistanceMeters / 6378100,
-                ],
-              },
+    // Find users within 1000 meters of the specified latitude and longitude
+    var near_by = await User.find({
+      $and: [
+        { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
+        { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
+        {
+          locations: {
+            $geoWithin: {
+              $centerSphere: [
+                [yourLongitude, yourLatitude],
+                maxDistanceMeters / 6378100,
+              ],
             },
           },
-        ],
-      });
+        },
+      ],
+    });
 
-      console.table(near_by);
+    console.table(near_by);
 
-      cluster_users = cluster_users.concat(near_by);
-    }
+    cluster_users = cluster_users.concat(near_by);
+    // }
 
     // get unique users
+
+    console.log(cluster_users.length);
 
     cluster_users = cluster_users.filter(
       (thing, index, self) =>
