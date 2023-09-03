@@ -289,9 +289,9 @@ const feed = async (req, res) => {
   try {
     // get random users  every time user login
 
-    var users = await User.find({
-      _id: { $ne: req.user._id },
-    }).select("-password");
+    // var users = await User.find({
+    //   _id: { $ne: req.user._id },
+    // }).select("-password");
 
     // find users which cluster id is same as the user
 
