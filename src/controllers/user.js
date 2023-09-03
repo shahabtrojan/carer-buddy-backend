@@ -299,6 +299,27 @@ const feed = async (req, res) => {
       cluster_id: req.user.cluster_id,
     }).select("-password");
 
+    const yourLatitude = req.body.latitude ?? req.user?.locations?.latitude;
+    const yourLongitude = req.body.longitude ?? req.user?.locations?.longitude;
+    const maxDistanceMeters = 1000;
+
+    // Find users within 1000 meters of the specified latitude and longitude
+    var near_by = await User.find({
+      "locations.longitude": { $ne: "" },
+      "locations.latitude": { $ne: "" },
+      location: {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [yourLongitude, yourLatitude],
+          },
+          $maxDistance: maxDistanceMeters,
+        },
+      },
+    });
+
+    cluster_users = cluster_users.concat(near_by);
+
     res.status(200).json({
       code: 200,
       message: "success",

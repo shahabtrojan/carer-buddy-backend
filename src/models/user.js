@@ -73,6 +73,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+userSchema.index({ location: "2dsphere" });
+
 /* The `userSchema.methods.generateAuthToken` function is a method defined on the `userSchema` object.
 It is used to generate an authentication token for a user. */
 userSchema.methods.generateAuthToken = function () {
