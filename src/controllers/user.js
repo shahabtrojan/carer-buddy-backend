@@ -1,6 +1,6 @@
 const { User, validate_signuo } = require("../models/user");
 const bcrypt = require("bcrypt");
-const { predict } = require("../utils/predictions");
+const { predict, generate_fake_data } = require("../utils/predictions");
 const signup = async (req, res) => {
   try {
     const { error } = validate_signuo(req.body);
@@ -313,17 +313,20 @@ const feed = async (req, res) => {
 
       // Find users within 1000 meters of the specified latitude and longitude
       var near_by = await User.find({
-        "locations.longitude": { $ne: "" },
-        "locations.latitude": { $ne: "" },
-        location: {
-          $nearSphere: {
-            $geometry: {
-              type: "Point",
-              coordinates: [yourLongitude, yourLatitude],
+        $and: [
+          { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
+          { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
+          {
+            locations: {
+              $geoWithin: {
+                $centerSphere: [
+                  [yourLongitude, yourLatitude],
+                  maxDistanceMeters / 6378100,
+                ],
+              },
             },
-            $maxDistance: maxDistanceMeters,
           },
-        },
+        ],
       });
 
       cluster_users = cluster_users.concat(near_by);
@@ -504,7 +507,37 @@ const get_predictions = async (req, res) => {
   }
 };
 
-// get seeds for the database
+const insert_fake_data = async (req, res) => {
+  try {
+    for (let index = 0; index < 500; index++) {
+      var user = await generate_fake_data();
+
+      var data_to_pass = {
+        interest_1: user.interests[0] ?? "music",
+        interest_2: user.interests[1] ?? "music",
+        interest_3: user.interests[2] ?? "music",
+        disease_1: user.diseases[0] ?? "none",
+        disease_2: user.diseases[1] ?? "none",
+        disease_3: user.diseases[2] ?? "none",
+        status: user.status ?? "single",
+        gender: "male",
+      };
+
+      var predictions = await predict(data_to_pass);
+      console.log(predictions);
+      user.cluster_id = predictions[0];
+
+      user = await user.save();
+    }
+    return res.status(200).json({
+      code: 200,
+      message: "success",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server Error" });
+  }
+};
 
 module.exports = {
   signup,
@@ -520,4 +553,5 @@ module.exports = {
   get_requests,
   get_predictions,
   get_profile_by_id,
+  insert_fake_data,
 };

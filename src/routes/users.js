@@ -16,6 +16,7 @@ const {
   get_requests,
   get_predictions,
   get_profile_by_id,
+  insert_fake_data,
 } = require("../controllers/user");
 
 const auth = require("../middleware/authenticate");
@@ -41,5 +42,7 @@ router.route("/get_predictions").post(auth, get_predictions);
 router
   .route("/get_profile_by_id/:id")
   .get(auth, checkParameter("id"), get_profile_by_id);
+
+router.route("/insert_fake_data").get(insert_fake_data);
 
 module.exports = router;
