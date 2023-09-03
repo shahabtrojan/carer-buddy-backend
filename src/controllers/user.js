@@ -345,7 +345,7 @@ const feed = async (req, res) => {
     res.status(200).json({
       code: 200,
       message: "success",
-      users: users,
+      users: cluster_users,
       cluster_users: cluster_users,
     });
   } catch (error) {
