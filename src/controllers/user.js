@@ -299,26 +299,33 @@ const feed = async (req, res) => {
       cluster_id: req.user.cluster_id,
     }).select("-password");
 
-    const yourLatitude = req.body.latitude ?? req.user?.locations?.latitude;
-    const yourLongitude = req.body.longitude ?? req.user?.locations?.longitude;
-    const maxDistanceMeters = 1000;
+    if (
+      !!req.body.latitude &&
+      !!req.body.longitude &&
+      req.body.latitude !== "" &&
+      req.body.longitude !== ""
+    ) {
+      const yourLatitude = req.user.locations.latitude ?? "30.3753";
+      const yourLongitude = req.user.locations.longitude ?? "69.3451";
+      const maxDistanceMeters = 10000;
 
-    // Find users within 1000 meters of the specified latitude and longitude
-    var near_by = await User.find({
-      "locations.longitude": { $ne: "" },
-      "locations.latitude": { $ne: "" },
-      location: {
-        $nearSphere: {
-          $geometry: {
-            type: "Point",
-            coordinates: [yourLongitude, yourLatitude],
+      // Find users within 1000 meters of the specified latitude and longitude
+      var near_by = await User.find({
+        "locations.longitude": { $ne: "" },
+        "locations.latitude": { $ne: "" },
+        location: {
+          $nearSphere: {
+            $geometry: {
+              type: "Point",
+              coordinates: [yourLongitude, yourLatitude],
+            },
+            $maxDistance: maxDistanceMeters,
           },
-          $maxDistance: maxDistanceMeters,
         },
-      },
-    });
+      });
 
-    cluster_users = cluster_users.concat(near_by);
+      cluster_users = cluster_users.concat(near_by);
+    }
 
     res.status(200).json({
       code: 200,
