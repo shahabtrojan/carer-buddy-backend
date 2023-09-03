@@ -520,7 +520,7 @@ const insert_fake_data = async (req, res) => {
         disease_2: user.diseases[1] ?? "none",
         disease_3: user.diseases[2] ?? "none",
         status: user.status ?? "single",
-        gender: "male",
+        sex: "m",
       };
 
       var predictions = await predict(data_to_pass);
