@@ -329,6 +329,8 @@ const feed = async (req, res) => {
         ],
       });
 
+      console.table(near_by);
+
       cluster_users = cluster_users.concat(near_by);
     }
 
