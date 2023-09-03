@@ -511,7 +511,7 @@ const get_predictions = async (req, res) => {
 
 const insert_fake_data = async (req, res) => {
   try {
-    for (let index = 0; index < 500; index++) {
+    for (let index = 0; index < 100; index++) {
       var user = await generate_fake_data();
 
       var data_to_pass = {
@@ -522,7 +522,7 @@ const insert_fake_data = async (req, res) => {
         disease_2: user.diseases[1] ?? "none",
         disease_3: user.diseases[2] ?? "none",
         status: user.status ?? "single",
-        sex: "m",
+        sex: user.gender,
       };
 
       var predictions = await predict(data_to_pass);
