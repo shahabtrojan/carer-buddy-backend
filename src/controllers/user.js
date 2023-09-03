@@ -264,12 +264,19 @@ const edit_profile = async (req, res) => {
         message: "User not found",
       });
 
+    var gender;
+    if (req.body.gender == "male") {
+      gender = "m";
+    } else {
+      gender = "f";
+    }
     user.first_name = req.body.first_name;
     user.last_name = req.body.last_name;
     user.image = req.body.image;
-    user.gender = req.body.gender;
+    user.gender = gender;
     user.contact_number = req.body.contact_number;
     user.profile_completed = req.body.profile_completed;
+
     user = await user.save();
 
     return res.status(200).json({
