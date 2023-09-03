@@ -29,7 +29,7 @@ router.route("/interest").post(auth, add_interest);
 router.route("/location").post(auth, add_location);
 router.route("/disease").post(auth, add_disease);
 router.route("/edit_profile").post(auth, edit_profile);
-router.route("/feed").get(auth, feed);
+router.route("/feed").post(auth, feed);
 router
   .route("/request_message/:id")
   .get(auth, checkParameter("id"), request_message);

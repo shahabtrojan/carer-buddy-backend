@@ -299,14 +299,16 @@ const feed = async (req, res) => {
       cluster_id: req.user.cluster_id,
     }).select("-password");
 
+    cluster_users = cluster_users.concat(users);
+
     if (
       !!req.body.latitude &&
       !!req.body.longitude &&
       req.body.latitude !== "" &&
       req.body.longitude !== ""
     ) {
-      const yourLatitude = req.user.locations.latitude ?? "30.3753";
-      const yourLongitude = req.user.locations.longitude ?? "69.3451";
+      const yourLatitude = req.body.latitude;
+      const yourLongitude = req.body.longitude;
       const maxDistanceMeters = 10000;
 
       // Find users within 1000 meters of the specified latitude and longitude
@@ -326,6 +328,14 @@ const feed = async (req, res) => {
 
       cluster_users = cluster_users.concat(near_by);
     }
+
+    // get unique users
+
+    cluster_users = cluster_users.filter(
+      (thing, index, self) =>
+        index ===
+        self.findIndex((t) => t._id.toString() === thing._id.toString())
+    );
 
     res.status(200).json({
       code: 200,
@@ -493,6 +503,8 @@ const get_predictions = async (req, res) => {
     return res.status(500).json({ msg: "Server Error" });
   }
 };
+
+// get seeds for the database
 
 module.exports = {
   signup,
