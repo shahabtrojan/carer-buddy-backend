@@ -264,7 +264,7 @@ const edit_profile = async (req, res) => {
         message: "User not found",
       });
 
-    var gender = req.body.gender;
+    var gender = req.body.gender ?? "";
 
     user.first_name = req.body.first_name;
     user.last_name = req.body.last_name;
