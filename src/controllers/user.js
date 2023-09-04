@@ -11,7 +11,7 @@ const signup = async (req, res) => {
       });
     }
 
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, home_address } = req.body;
 
     // check if user already exists
 
@@ -31,6 +31,7 @@ const signup = async (req, res) => {
       last_name,
       email,
       password,
+      home_address,
     });
 
     user = await user.save();

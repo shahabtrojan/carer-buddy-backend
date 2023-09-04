@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    home_address: {
+      type: String,
+      default: "",
+    },
     cluster_id: {
       type: Number,
       default: 0,
@@ -104,6 +108,7 @@ const validate_signuo = (user) => {
     last_name: Joi.string().min(3).max(30).required(),
     email: Joi.string().min(3).max(30).required(),
     password: Joi.string().min(3).max(30).required(),
+    home_address: Joi.string().min(3).max(30).required(),
   });
   return schema.validate(user);
 };
