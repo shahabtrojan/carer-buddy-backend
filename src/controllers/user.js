@@ -273,6 +273,7 @@ const edit_profile = async (req, res) => {
     user.gender = gender;
     user.contact_number = req.body.contact_number;
     user.profile_completed = req.body.profile_completed;
+    user.home_address = req.body.home_address;
 
     user = await user.save();
 
