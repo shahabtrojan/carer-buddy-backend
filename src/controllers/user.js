@@ -264,12 +264,8 @@ const edit_profile = async (req, res) => {
         message: "User not found",
       });
 
-    var gender;
-    if (req.body.gender == "male") {
-      gender = "m";
-    } else {
-      gender = "f";
-    }
+    var gender = req.body.gender;
+
     user.first_name = req.body.first_name;
     user.last_name = req.body.last_name;
     user.image = req.body.image;
@@ -308,38 +304,39 @@ const feed = async (req, res) => {
 
     // cluster_users = cluster_users.concat(users);
 
-    // if (
-    //   !!req.body.latitude &&
-    //   !!req.body.longitude &&
-    //   req.body.latitude !== "" &&
-    //   req.body.longitude !== ""
-    // ) {
-    const yourLatitude = req.body.latitude ?? req.user.locations.latitude ?? "";
-    const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
-    const maxDistanceMeters = 10000;
+    if (
+      !!req.body.latitude &&
+      !!req.body.longitude &&
+      req.body.latitude !== "" &&
+      req.body.longitude !== ""
+    ) {
+      const yourLatitude =
+        req.body.latitude ?? req.user.locations.latitude ?? "";
+      const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
+      const maxDistanceMeters = 10000;
 
-    // Find users within 1000 meters of the specified latitude and longitude
-    var near_by = await User.find({
-      $and: [
-        { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
-        { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
-        {
-          locations: {
-            $geoWithin: {
-              $centerSphere: [
-                [yourLongitude, yourLatitude],
-                maxDistanceMeters / 6378100,
-              ],
+      // Find users within 1000 meters of the specified latitude and longitude
+      var near_by = await User.find({
+        $and: [
+          { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
+          { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
+          {
+            locations: {
+              $geoWithin: {
+                $centerSphere: [
+                  [yourLongitude, yourLatitude],
+                  maxDistanceMeters / 6378100,
+                ],
+              },
             },
           },
-        },
-      ],
-    });
+        ],
+      });
 
-    console.table(near_by);
+      console.table(near_by);
 
-    cluster_users = cluster_users.concat(near_by);
-    // }
+      cluster_users = cluster_users.concat(near_by);
+    }
 
     // get unique users
 
