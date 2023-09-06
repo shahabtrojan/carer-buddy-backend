@@ -356,21 +356,139 @@ const edit_profile = async (req, res) => {
 // feed api in which every tiome user login it will show the feed of the user
 
 const feed = async (req, res) => {
+  // try {
+  //   // get random users  every time user login
+
+  //   // var users = await User.find({
+  //   //   _id: { $ne: req.user._id },
+  //   // }).select("-password");
+
+  //   // find users which cluster id is same as the user
+
+  //   var cluster_users = [];
+  //   // var cluster_users = await User.find({
+  //   //   cluster_id: req.user.cluster_id,
+  //   // }).select("-password");
+
+  //   // cluster_users = cluster_users.concat(users);
+
+  //   if (
+  //     !!req.body.latitude &&
+  //     !!req.body.longitude &&
+  //     req.body.latitude !== "" &&
+  //     req.body.longitude !== ""
+  //   ) {
+  //     const yourLatitude =
+  //       req.body.latitude ?? req.user.locations.latitude ?? "";
+  //     const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
+  //     const maxDistanceMeters = 10000;
+
+  //     // if (
+  //     //   req.user.gender != "" ||
+  //     //   req.user.status != "" ||
+  //     //   req.user.interests.length != 0 ||
+  //     //   req.user.diseases.length != 0
+  //     // ) {
+  //     //   console.log("here");
+  //     // Find users within 1000 meters of the specified latitude and longitude
+  //     var near_by = await User.find({
+  //       $and: [
+  //         { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
+  //         { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
+  //         {
+  //           locations: {
+  //             $geoWithin: {
+  //               $centerSphere: [
+  //                 [yourLongitude, yourLatitude],
+  //                 maxDistanceMeters / 6378100,
+  //               ],
+  //             },
+  //           },
+  //         },
+  //         // {
+  //         //   cluster_id: req.user.cluster_id,
+  //         // },
+  //       ],
+  //     });
+
+  //     console.log({
+  //       near_by,
+  //     });
+
+  //     cluster_users = cluster_users.concat(near_by);
+  //   }
+
+  //   // get unique users
+
+  //   // get users with my same intrests or disense or gener or status
+
+  //   var query_object = {
+  //     $or: [
+  //       {
+  //         gemder: req.user.gender,
+  //       },
+  //       {
+  //         status: req.user.status,
+  //       },
+  //     ],
+  //   };
+
+  //   if (req.user.interests.length > 0) {
+  //     query_object = {
+  //       ...query_object,
+  //       $or: [{ interests: { $in: req.user.interests } }],
+  //     };
+  //   } else if (req.user.diseases.length > 0) {
+  //     query_object = {
+  //       ...query_object,
+  //       $or: [{ diseases: { $in: req.user.diseases } }],
+  //     };
+  //   }
+
+  //   // check if query object is empty or not
+
+  //   if (Object.keys(query_object).length > 0) {
+  //     var similar_users = await User.find({
+  //       $or: [
+  //         { interests: { $in: req.user.interests } },
+  //         { diseases: { $in: req.user.diseases } },
+  //         {
+  //           gender: req.user.gender,
+  //         },
+  //         {
+  //           status: req.user.status,
+  //         },
+  //       ],
+  //     }).select("-password");
+
+  //     console.log({
+  //       similar_users,
+  //     });
+
+  //     cluster_users = cluster_users.concat(similar_users);
+
+  //     console.log(cluster_users.length);
+
+  //     cluster_users = Array.from(new Set(cluster_users.map((a) => a._id))).map(
+  //       (id) => {
+  //         return cluster_users.find((a) => a._id === id);
+  //       }
+  //     );
+  //   }
+
+  //   res.status(200).json({
+  //     code: 200,
+  //     message: "success",
+  //     users: cluster_users,
+  //     cluster_users: cluster_users,
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  //   return res.status(500).json({ msg: "Server Error" });
+  // }
+
   try {
-    // get random users  every time user login
-
-    // var users = await User.find({
-    //   _id: { $ne: req.user._id },
-    // }).select("-password");
-
-    // find users which cluster id is same as the user
-
     var cluster_users = [];
-    // var cluster_users = await User.find({
-    //   cluster_id: req.user.cluster_id,
-    // }).select("-password");
-
-    // cluster_users = cluster_users.concat(users);
 
     if (
       !!req.body.latitude &&
@@ -378,23 +496,16 @@ const feed = async (req, res) => {
       req.body.latitude !== "" &&
       req.body.longitude !== ""
     ) {
+      // Your geospatial query here to find users within a certain distance
       const yourLatitude =
         req.body.latitude ?? req.user.locations.latitude ?? "";
       const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
       const maxDistanceMeters = 10000;
 
-      // if (
-      //   req.user.gender != "" ||
-      //   req.user.status != "" ||
-      //   req.user.interests.length != 0 ||
-      //   req.user.diseases.length != 0
-      // ) {
-      //   console.log("here");
-      // Find users within 1000 meters of the specified latitude and longitude
       var near_by = await User.find({
         $and: [
-          { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
-          { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
+          { "locations.latitude": { $ne: "" } },
+          { "locations.longitude": { $ne: "" } },
           {
             locations: {
               $geoWithin: {
@@ -405,77 +516,51 @@ const feed = async (req, res) => {
               },
             },
           },
-          // {
-          //   cluster_id: req.user.cluster_id,
-          // },
         ],
-      });
-
-      console.log({
-        near_by,
       });
 
       cluster_users = cluster_users.concat(near_by);
     }
 
-    // get unique users
+    var query_object = {};
 
-    // get users with my same intrests or disense or gener or status
-
-    var query_object = {
-      _id: { $ne: req.user._id },
-      $or: [
-        {
-          gemder: req.user.gender,
-        },
-        {
-          status: req.user.status,
-        },
-      ],
-    };
-
-    if (req.user.interests.length > 0) {
+    if (req.user.gender != "" || req.user.status != "") {
       query_object = {
-        ...query_object,
-        $or: [{ interests: { $in: req.user.interests } }],
-      };
-    } else if (req.user.diseases.length > 0) {
-      query_object = {
-        ...query_object,
-        $or: [{ diseases: { $in: req.user.diseases } }],
-      };
-    }
-
-    // check if query object is empty or not
-
-    if (Object.keys(query_object).length > 0) {
-      var similar_users = await User.find({
         $or: [
-          { interests: { $in: req.user.interests } },
-          { diseases: { $in: req.user.diseases } },
           {
             gender: req.user.gender,
           },
+        ],
+      };
+    } else if (req.user.status != "") {
+      query_object = {
+        $or: [
           {
             status: req.user.status,
           },
         ],
-      }).select("-password");
-
-      console.log({
-        similar_users,
-      });
-
-      cluster_users = cluster_users.concat(similar_users);
-
-      console.log(cluster_users.length);
-
-      cluster_users = Array.from(new Set(cluster_users.map((a) => a._id))).map(
-        (id) => {
-          return cluster_users.find((a) => a._id === id);
-        }
-      );
+      };
     }
+
+    if (req.user.interests.length > 0) {
+      query_object.$or.push({ interests: { $in: req.user.interests } });
+    }
+
+    if (req.user.diseases.length > 0) {
+      query_object.$or.push({ diseases: { $in: req.user.diseases } });
+    }
+
+    console.log({
+      query_object,
+    });
+    var similar_users = await User.find(query_object).select("-password");
+
+    cluster_users = cluster_users.concat(similar_users);
+
+    // Remove duplicates based on _id
+    cluster_users = cluster_users.filter(
+      (user, index, self) => index === self.findIndex((u) => u._id === user._id)
+    );
 
     res.status(200).json({
       code: 200,
