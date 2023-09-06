@@ -536,6 +536,7 @@ const feed = async (req, res) => {
       req.user.gemder != null &&
       req.user.gemder != undefined
     ) {
+      console.log("here in gender");
       gender_by_users = await User.find({
         gender: req.user.gemder,
       }).select("-password");
@@ -544,18 +545,21 @@ const feed = async (req, res) => {
       req.user.status != null &&
       req.user.status != undefined
     ) {
+      console.log("here in status");
       statu_by_users = await User.find({
         status: req.user.status,
       }).select("-password");
     }
 
     if (req.user.interests.length > 0) {
+      console.log("here in intrest");
       intrest_by_users = await User.find({
         interests: { $in: req.user.interests },
       }).select("-password");
     }
 
     if (req.user.diseases.length > 0) {
+      console.log("here in disease");
       disease_by_users = await User.find({
         diseases: { $in: req.user.diseases },
       }).select("-password");
