@@ -139,9 +139,9 @@ const get_profile = async (req, res) => {
     };
     var predictions = await predict(data_to_pass);
     console.log(predictions);
-    user.cluster_id = predictions[0];
-    console.log(user);
-    user = await user.save();
+    // user.cluster_id = predictions[0];
+    // console.log(user);
+    // user = await user.save();
     // }
 
     return res.status(200).json({
@@ -196,6 +196,22 @@ const add_interest = async (req, res) => {
     user.interests = req.body.interests;
     user = await user.save();
 
+    var data_to_pass = {
+      interest_1: user.interests[0] ?? "",
+      interest_2: user.interests[1] ?? "",
+      interest_3: user.interests[2] ?? "",
+      disease_1: user.diseases[0] ?? "",
+      disease_2: user.diseases[1] ?? "",
+      disease_3: user.diseases[2] ?? "",
+      status: user.status ?? "",
+      sex: user.gender ?? "m",
+    };
+    var predictions = await predict(data_to_pass);
+    console.log(predictions);
+    user.cluster_id = predictions[0];
+    console.log(user);
+    user = await user.save();
+
     return res.status(200).json({
       code: 200,
       message: "Interest added successfully",
@@ -220,6 +236,22 @@ const add_location = async (req, res) => {
     user.locations = req.body.locations;
     user = await user.save();
 
+    var data_to_pass = {
+      interest_1: user.interests[0] ?? "",
+      interest_2: user.interests[1] ?? "",
+      interest_3: user.interests[2] ?? "",
+      disease_1: user.diseases[0] ?? "",
+      disease_2: user.diseases[1] ?? "",
+      disease_3: user.diseases[2] ?? "",
+      status: user.status ?? "",
+      sex: user.gender ?? "m",
+    };
+    var predictions = await predict(data_to_pass);
+    console.log(predictions);
+    user.cluster_id = predictions[0];
+    console.log(user);
+    user = await user.save();
+
     return res.status(200).json({
       code: 200,
       message: "Location added successfully",
@@ -242,6 +274,22 @@ const add_disease = async (req, res) => {
       });
 
     user.diseases = req.body.diseases;
+    user = await user.save();
+
+    var data_to_pass = {
+      interest_1: user.interests[0] ?? "",
+      interest_2: user.interests[1] ?? "",
+      interest_3: user.interests[2] ?? "",
+      disease_1: user.diseases[0] ?? "",
+      disease_2: user.diseases[1] ?? "",
+      disease_3: user.diseases[2] ?? "",
+      status: user.status ?? "",
+      sex: user.gender ?? "m",
+    };
+    var predictions = await predict(data_to_pass);
+    console.log(predictions);
+    user.cluster_id = predictions[0];
+    console.log(user);
     user = await user.save();
 
     return res.status(200).json({
@@ -275,6 +323,22 @@ const edit_profile = async (req, res) => {
     user.profile_completed = req.body.profile_completed;
     user.home_address = req.body.home_address;
 
+    user = await user.save();
+
+    var data_to_pass = {
+      interest_1: user.interests[0] ?? "",
+      interest_2: user.interests[1] ?? "",
+      interest_3: user.interests[2] ?? "",
+      disease_1: user.diseases[0] ?? "",
+      disease_2: user.diseases[1] ?? "",
+      disease_3: user.diseases[2] ?? "",
+      status: user.status ?? "",
+      sex: user.gender ?? "m",
+    };
+    var predictions = await predict(data_to_pass);
+    console.log(predictions);
+    user.cluster_id = predictions[0];
+    console.log(user);
     user = await user.save();
 
     return res.status(200).json({
