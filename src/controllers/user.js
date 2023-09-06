@@ -543,11 +543,15 @@ const feed = async (req, res) => {
     }
 
     if (req.user.interests.length > 0) {
-      query_object.$or.push({ interests: { $in: req.user.interests } });
-    }
-
-    if (req.user.diseases.length > 0) {
-      query_object.$or.push({ diseases: { $in: req.user.diseases } });
+      query_object = {
+        ...query_object,
+        $or: [{ interests: { $in: req.user.interests } }],
+      };
+    } else if (req.user.diseases.length > 0) {
+      query_object = {
+        ...query_object,
+        $or: [{ diseases: { $in: req.user.diseases } }],
+      };
     }
 
     console.log({
