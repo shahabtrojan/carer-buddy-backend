@@ -322,6 +322,7 @@ const edit_profile = async (req, res) => {
     user.contact_number = req.body.contact_number;
     user.profile_completed = req.body.profile_completed;
     user.home_address = req.body.home_address;
+    user.status = req.body.status;
 
     user = await user.save();
 
