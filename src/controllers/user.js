@@ -428,10 +428,14 @@ const feed = async (req, res) => {
         { interests: { $in: req.user.interests } },
         { diseases: { $in: req.user.diseases } },
         {
-          gender: req.user.gender,
-        },
-        {
-          status: req.user.status,
+          $and: [
+            {
+              gender: req.user.gender,
+            },
+            {
+              status: req.user.status,
+            },
+          ],
         },
       ],
     }).select("-password");
