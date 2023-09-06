@@ -383,9 +383,13 @@ const feed = async (req, res) => {
       const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
       const maxDistanceMeters = 10000;
 
-      var result = await check_profile(req.user);
-
-      if (result == true) {
+      if (
+        req.user.gender != "" ||
+        req.user.status != "" ||
+        req.user.interests.length != 0 ||
+        req.user.diseases.length != 0
+      ) {
+        console.log("here");
         // Find users within 1000 meters of the specified latitude and longitude
         var near_by = await User.find({
           $and: [
