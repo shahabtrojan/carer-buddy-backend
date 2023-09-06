@@ -440,11 +440,7 @@ const feed = async (req, res) => {
 
       console.log(cluster_users.length);
 
-      cluster_users = cluster_users.filter(
-        (thing, index, self) =>
-          index ===
-          self.findIndex((t) => t._id.toString() === thing._id.toString())
-      );
+      cluster_users = new Set(cluster_users);
     } else {
       cluster_users = [];
     }
