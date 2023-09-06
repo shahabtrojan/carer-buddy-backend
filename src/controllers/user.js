@@ -490,6 +490,10 @@ const feed = async (req, res) => {
   try {
     var cluster_users = [];
 
+    var users = await User.find({
+      _id: { $ne: req.user._id },
+    }).select("-password");
+
     if (
       !!req.body.latitude &&
       !!req.body.longitude &&
@@ -522,55 +526,41 @@ const feed = async (req, res) => {
       cluster_users = cluster_users.concat(near_by);
     }
 
-    var query_object = {};
+    var gender_by_users = [];
+    var statu_by_users = [];
+    var intrest_by_users = [];
+    var disease_by_users = [];
 
-    if (req.user.gender != "" || req.user.status != "") {
-      query_object = {
-        $or: [
-          {
-            gender: req.user.gender,
-          },
-        ],
-      };
-    } else if (req.user.status != "") {
-      query_object = {
-        $or: [
-          {
-            status: req.user.status,
-          },
-        ],
-      };
+    if (!!req.user.gemder) {
+      gender_by_users = await User.find({
+        gender: req.user.gemder,
+      }).select("-password");
+    } else if (!!req.user.status) {
+      statu_by_users = await User.find({
+        status: req.user.status,
+      }).select("-password");
     }
 
     if (req.user.interests.length > 0) {
-      query_object = {
-        ...query_object,
-        $or: [{ interests: { $in: req.user.interests } }],
-      };
-    } else if (req.user.diseases.length > 0) {
-      query_object = {
-        ...query_object,
-        $or: [{ diseases: { $in: req.user.diseases } }],
-      };
+      intrest_by_users = await User.find({
+        interests: { $in: req.user.interests },
+      }).select("-password");
     }
 
-    console.log({
-      query_object,
-    });
-    var similar_users = await User.find({
-      $and: [
-        { gender: req.body.gender },
-        { status: req.body.status },
-        {
-          $or: [
-            { interests: { $in: req.body.interests } },
-            { diseases: { $in: req.body.diseases } },
-          ],
-        },
-      ],
-    });
+    if (req.user.diseases.length > 0) {
+      disease_by_users = await User.find({
+        diseases: { $in: req.user.diseases },
+      }).select("-password");
+    }
 
-    cluster_users = cluster_users.concat(similar_users);
+    const mergedUsers = [
+      ...gender_by_users,
+      ...statu_by_users,
+      ...intrest_by_users,
+      ...disease_by_users,
+    ];
+
+    cluster_users = cluster_users.concat(mergedUsers);
 
     // Remove duplicates based on _id
     cluster_users = cluster_users.filter(
@@ -580,7 +570,7 @@ const feed = async (req, res) => {
     res.status(200).json({
       code: 200,
       message: "success",
-      users: cluster_users,
+      users: users,
       cluster_users: cluster_users,
     });
   } catch (error) {
