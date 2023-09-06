@@ -506,24 +506,24 @@ const feed = async (req, res) => {
       const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
       const maxDistanceMeters = 10000;
 
-      var near_by = await User.find({
-        $and: [
-          { "locations.latitude": { $ne: "" } },
-          { "locations.longitude": { $ne: "" } },
-          {
-            locations: {
-              $geoWithin: {
-                $centerSphere: [
-                  [yourLongitude, yourLatitude],
-                  maxDistanceMeters / 6378100,
-                ],
-              },
-            },
-          },
-        ],
-      });
+      // var near_by = await User.find({
+      //   $and: [
+      //     { "locations.latitude": { $ne: "" } },
+      //     { "locations.longitude": { $ne: "" } },
+      //     {
+      //       locations: {
+      //         $geoWithin: {
+      //           $centerSphere: [
+      //             [yourLongitude, yourLatitude],
+      //             maxDistanceMeters / 6378100,
+      //           ],
+      //         },
+      //       },
+      //     },
+      //   ],
+      // });
 
-      cluster_users = cluster_users.concat(near_by);
+      // cluster_users = cluster_users.concat(near_by);
     }
 
     var gender_by_users = [];
@@ -531,11 +531,19 @@ const feed = async (req, res) => {
     var intrest_by_users = [];
     var disease_by_users = [];
 
-    if (!!req.user.gemder) {
+    if (
+      req.user.gemder != "" &&
+      req.user.gemder != null &&
+      req.user.gemder != undefined
+    ) {
       gender_by_users = await User.find({
         gender: req.user.gemder,
       }).select("-password");
-    } else if (!!req.user.status) {
+    } else if (
+      req.user.status != "" &&
+      req.user.status != null &&
+      req.user.status != undefined
+    ) {
       statu_by_users = await User.find({
         status: req.user.status,
       }).select("-password");
@@ -560,12 +568,20 @@ const feed = async (req, res) => {
       ...disease_by_users,
     ];
 
+    console.log({
+      mergedUsers,
+    });
+
     cluster_users = cluster_users.concat(mergedUsers);
 
     // Remove duplicates based on _id
     cluster_users = cluster_users.filter(
       (user, index, self) => index === self.findIndex((u) => u._id === user._id)
     );
+
+    console.log({
+      cluster_users,
+    });
 
     res.status(200).json({
       code: 200,
