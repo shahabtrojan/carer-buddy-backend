@@ -365,9 +365,10 @@ const feed = async (req, res) => {
 
     // find users which cluster id is same as the user
 
-    var cluster_users = await User.find({
-      cluster_id: req.user.cluster_id,
-    }).select("-password");
+    var cluster_users = [];
+    // var cluster_users = await User.find({
+    //   cluster_id: req.user.cluster_id,
+    // }).select("-password");
 
     // cluster_users = cluster_users.concat(users);
 
@@ -382,69 +383,75 @@ const feed = async (req, res) => {
       const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
       const maxDistanceMeters = 10000;
 
-      // Find users within 1000 meters of the specified latitude and longitude
-      var near_by = await User.find({
-        $and: [
-          { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
-          { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
-          {
-            locations: {
-              $geoWithin: {
-                $centerSphere: [
-                  [yourLongitude, yourLatitude],
-                  maxDistanceMeters / 6378100,
-                ],
+      var result = await check_profile(req.user);
+
+      if (result == true) {
+        // Find users within 1000 meters of the specified latitude and longitude
+        var near_by = await User.find({
+          $and: [
+            { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
+            { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
+            {
+              locations: {
+                $geoWithin: {
+                  $centerSphere: [
+                    [yourLongitude, yourLatitude],
+                    maxDistanceMeters / 6378100,
+                  ],
+                },
               },
             },
-          },
+            // {
+            //   cluster_id: req.user.cluster_id,
+            // },
+          ],
+        });
+
+        console.log({
+          near_by,
+        });
+
+        cluster_users = cluster_users.concat(near_by);
+      }
+
+      // get unique users
+
+      // get users with my same intrests or disense or gener or status
+
+      var similar_users = await User.find({
+        _id: { $ne: req.user._id },
+        $or: [
+          { interests: { $in: req.user.interests } },
+          { diseases: { $in: req.user.diseases } },
           {
-            cluster_id: req.user.cluster_id,
+            $and: [
+              {
+                gender: req.user.gender,
+              },
+              {
+                status: req.user.status,
+              },
+            ],
           },
         ],
-      });
+      }).select("-password");
 
       console.log({
-        near_by,
+        similar_users,
       });
 
-      cluster_users = cluster_users.concat(near_by);
+      cluster_users = cluster_users.concat(similar_users);
+
+      console.log(cluster_users.length);
+
+      cluster_users = cluster_users.filter(
+        (thing, index, self) =>
+          index ===
+          self.findIndex((t) => t._id.toString() === thing._id.toString())
+      );
+    } else {
+      cluster_users = [];
     }
-
-    // get unique users
-
-    // get users with my same intrests or disense or gener or status
-
-    var similar_users = await User.find({
-      _id: { $ne: req.user._id },
-      $or: [
-        { interests: { $in: req.user.interests } },
-        { diseases: { $in: req.user.diseases } },
-        {
-          $and: [
-            {
-              gender: req.user.gender,
-            },
-            {
-              status: req.user.status,
-            },
-          ],
-        },
-      ],
-    }).select("-password");
-
-    console.log({
-      similar_users,
-    });
-
-    cluster_users = cluster_users.concat(similar_users);
-
-    console.log(cluster_users.length);
-
-    cluster_users = cluster_users.filter(
-      (thing, index, self) =>
-        index ===
-        self.findIndex((t) => t._id.toString() === thing._id.toString())
-    );
 
     res.status(200).json({
       code: 200,
@@ -671,4 +678,25 @@ module.exports = {
   get_predictions,
   get_profile_by_id,
   insert_fake_data,
+};
+
+//  make a function that check if yser progile is completed or not
+
+const check_profile = async (user) => {
+  try {
+    if (
+      user.gender == "" ||
+      user.status == "" ||
+      user.home_address == "" ||
+      user.interests.length == 0 ||
+      user.diseases.length == 0
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 };
