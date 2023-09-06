@@ -538,6 +538,7 @@ const feed = async (req, res) => {
     ) {
       console.log("here in gender");
       gender_by_users = await User.find({
+        _id: { $ne: req.user._id },
         gender: req.user.gender,
       }).select("-password");
     } else if (
@@ -547,6 +548,7 @@ const feed = async (req, res) => {
     ) {
       console.log("here in status");
       statu_by_users = await User.find({
+        _id: { $ne: req.user._id },
         status: req.user.status,
       }).select("-password");
     }
@@ -554,6 +556,7 @@ const feed = async (req, res) => {
     if (req.user.interests.length > 0) {
       console.log("here in intrest");
       intrest_by_users = await User.find({
+        _id: { $ne: req.user._id },
         interests: { $in: req.user.interests },
       }).select("-password");
     }
@@ -561,6 +564,7 @@ const feed = async (req, res) => {
     if (req.user.diseases.length > 0) {
       console.log("here in disease");
       disease_by_users = await User.find({
+        _id: { $ne: req.user._id },
         diseases: { $in: req.user.diseases },
       }).select("-password");
     }
