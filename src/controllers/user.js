@@ -557,7 +557,18 @@ const feed = async (req, res) => {
     console.log({
       query_object,
     });
-    var similar_users = await User.find(query_object).select("-password");
+    var similar_users = await User.find({
+      $and: [
+        { gender: req.body.gender },
+        { status: req.body.status },
+        {
+          $or: [
+            { interests: { $in: req.body.interests } },
+            { diseases: { $in: req.body.diseases } },
+          ],
+        },
+      ],
+    });
 
     cluster_users = cluster_users.concat(similar_users);
 
