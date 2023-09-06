@@ -685,15 +685,15 @@ module.exports = {
 const check_profile = async (user) => {
   try {
     if (
-      user.gender == "" ||
-      user.status == "" ||
-      user.home_address == "" ||
-      user.interests.length == 0 ||
-      user.diseases.length == 0
+      user.gender != "" ||
+      user.status != "" ||
+      user.home_address != "" ||
+      user.interests.length != 0 ||
+      user.diseases.length != 0
     ) {
-      return false;
-    } else {
       return true;
+    } else {
+      return false;
     }
   } catch (error) {
     console.log(error);
