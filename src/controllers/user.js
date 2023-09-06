@@ -506,24 +506,25 @@ const feed = async (req, res) => {
       const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
       const maxDistanceMeters = 10000;
 
-      // var near_by = await User.find({
-      //   $and: [
-      //     { "locations.latitude": { $ne: "" } },
-      //     { "locations.longitude": { $ne: "" } },
-      //     {
-      //       locations: {
-      //         $geoWithin: {
-      //           $centerSphere: [
-      //             [yourLongitude, yourLatitude],
-      //             maxDistanceMeters / 6378100,
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   ],
-      // });
+      var near_by = await User.find({
+        _id: { $ne: req.user._id },
+        $and: [
+          { "locations.latitude": { $ne: "" } },
+          { "locations.longitude": { $ne: "" } },
+          {
+            locations: {
+              $geoWithin: {
+                $centerSphere: [
+                  [yourLongitude, yourLatitude],
+                  maxDistanceMeters / 6378100,
+                ],
+              },
+            },
+          },
+        ],
+      });
 
-      // cluster_users = cluster_users.concat(near_by);
+      users = users.concat(near_by);
     }
 
     var gender_by_users = [];
@@ -591,10 +592,40 @@ const feed = async (req, res) => {
       cluster_users,
     });
 
+    var result = await filterUser(users, req.user);
+
+    // sort user by neary by users
+
+    result = result.sort((a, b) => {
+      if (
+        a.locations.latitude == "" ||
+        a.locations.longitude == "" ||
+        b.locations.latitude == "" ||
+        b.locations.longitude == ""
+      ) {
+        return result;
+      } else {
+        return (
+          getDistanceFromLatLonInKm(
+            req.user.locations.latitude,
+            req.user.locations.longitude,
+            a.locations.latitude,
+            a.locations.longitude
+          ) -
+          getDistanceFromLatLonInKm(
+            req.user.locations.latitude,
+            req.user.locations.longitude,
+            b.locations.latitude,
+            b.locations.longitude
+          )
+        );
+      }
+    });
+
     res.status(200).json({
       code: 200,
       message: "success",
-      users: users,
+      users: result,
       cluster_users: cluster_users,
     });
   } catch (error) {
@@ -838,3 +869,78 @@ const check_profile = async (user) => {
     return false;
   }
 };
+
+const filterUser = async (data, profile) => {
+  // same gender
+  const sameGenderData = data.filter(
+    (user) => profile?.gender?.length && user.gender === profile.gender
+  );
+  // same status
+  const sameStatusData = data.filter(
+    (user) => profile?.status?.length > 0 && user.status === profile.status
+  );
+
+  // same interest
+  const sameInterestData = [];
+  if (profile.interests.length > 0) {
+    data.map((user) => {
+      profile.interests.map((myInterest) => {
+        if (myInterest.length > 0 && user.interests.includes(myInterest)) {
+          sameInterestData.push(user);
+        }
+      });
+    });
+  }
+
+  // same interest
+  const sameDiseaseData = [];
+  if (profile.interests.length > 0) {
+    data.map((user) => {
+      profile.diseases.map((myDisease) => {
+        if (myDisease.length > 0 && user.diseases.includes(myDisease)) {
+          sameDiseaseData.push(user);
+        }
+      });
+    });
+  }
+
+  const allFiltersData = [
+    ...sameGenderData,
+    ...sameStatusData,
+    ...sameInterestData,
+    ...sameDiseaseData,
+  ];
+  const uniqueUsersData = [];
+  allFiltersData.map((user) => {
+    let pushUser = true;
+    uniqueUsersData.map((uniqueUser) => {
+      if (uniqueUser._id === user._id) pushUser = false;
+    });
+    if (pushUser) {
+      uniqueUsersData.push(user);
+    }
+  });
+  console.log(uniqueUsersData, "uniqueUsersData");
+  // setUsersFeed([...uniqueUsersData]);
+
+  return uniqueUsersData;
+};
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
+
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  var d = R * c; // Distance in km
+
+  return d;
+}
