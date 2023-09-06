@@ -383,75 +383,72 @@ const feed = async (req, res) => {
       const yourLongitude = req.body.longitude ?? req.user.locations.longitude;
       const maxDistanceMeters = 10000;
 
-      if (
-        req.user.gender != "" ||
-        req.user.status != "" ||
-        req.user.interests.length != 0 ||
-        req.user.diseases.length != 0
-      ) {
-        console.log("here");
-        // Find users within 1000 meters of the specified latitude and longitude
-        var near_by = await User.find({
-          $and: [
-            { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
-            { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
-            {
-              locations: {
-                $geoWithin: {
-                  $centerSphere: [
-                    [yourLongitude, yourLatitude],
-                    maxDistanceMeters / 6378100,
-                  ],
-                },
+      // if (
+      //   req.user.gender != "" ||
+      //   req.user.status != "" ||
+      //   req.user.interests.length != 0 ||
+      //   req.user.diseases.length != 0
+      // ) {
+      //   console.log("here");
+      // Find users within 1000 meters of the specified latitude and longitude
+      var near_by = await User.find({
+        $and: [
+          { "locations.latitude": { $ne: "" } }, // Ensure latitude is not empty
+          { "locations.longitude": { $ne: "" } }, // Ensure longitude is not empty
+          {
+            locations: {
+              $geoWithin: {
+                $centerSphere: [
+                  [yourLongitude, yourLatitude],
+                  maxDistanceMeters / 6378100,
+                ],
               },
             },
-            // {
-            //   cluster_id: req.user.cluster_id,
-            // },
-          ],
-        });
-
-        console.log({
-          near_by,
-        });
-
-        cluster_users = cluster_users.concat(near_by);
-      }
-
-      // get unique users
-
-      // get users with my same intrests or disense or gener or status
-
-      var similar_users = await User.find({
-        _id: { $ne: req.user._id },
-        $or: [
-          { interests: { $in: req.user.interests } },
-          { diseases: { $in: req.user.diseases } },
-          {
-            gender: req.user.gender,
           },
-          {
-            status: req.user.status,
-          },
+          // {
+          //   cluster_id: req.user.cluster_id,
+          // },
         ],
-      }).select("-password");
-
-      console.log({
-        similar_users,
       });
 
-      cluster_users = cluster_users.concat(similar_users);
+      console.log({
+        near_by,
+      });
 
-      console.log(cluster_users.length);
-
-      cluster_users = Array.from(new Set(cluster_users.map((a) => a._id))).map(
-        (id) => {
-          return cluster_users.find((a) => a._id === id);
-        }
-      );
-    } else {
-      cluster_users = [];
+      cluster_users = cluster_users.concat(near_by);
     }
+
+    // get unique users
+
+    // get users with my same intrests or disense or gener or status
+
+    var similar_users = await User.find({
+      _id: { $ne: req.user._id },
+      $or: [
+        { interests: { $in: req.user.interests } },
+        { diseases: { $in: req.user.diseases } },
+        {
+          gender: req.user.gender,
+        },
+        {
+          status: req.user.status,
+        },
+      ],
+    }).select("-password");
+
+    console.log({
+      similar_users,
+    });
+
+    cluster_users = cluster_users.concat(similar_users);
+
+    console.log(cluster_users.length);
+
+    cluster_users = Array.from(new Set(cluster_users.map((a) => a._id))).map(
+      (id) => {
+        return cluster_users.find((a) => a._id === id);
+      }
+    );
 
     res.status(200).json({
       code: 200,
