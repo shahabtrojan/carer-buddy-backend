@@ -422,32 +422,60 @@ const feed = async (req, res) => {
 
     // get users with my same intrests or disense or gener or status
 
-    var similar_users = await User.find({
+    var query_object = {
+      _id: { $ne: req.user._id },
       $or: [
-        { interests: { $in: req.user.interests } },
-        { diseases: { $in: req.user.diseases } },
         {
-          gender: req.user.gender,
+          gemder: req.user.gender,
         },
         {
           status: req.user.status,
         },
       ],
-    }).select("-password");
+    };
 
-    console.log({
-      similar_users,
-    });
+    if (req.user.interests.length > 0) {
+      query_object = {
+        ...query_object,
+        $or: [{ interests: { $in: req.user.interests } }],
+      };
+    } else if (req.user.diseases.length > 0) {
+      query_object = {
+        ...query_object,
+        $or: [{ diseases: { $in: req.user.diseases } }],
+      };
+    }
 
-    cluster_users = cluster_users.concat(similar_users);
+    // check if query object is empty or not
 
-    console.log(cluster_users.length);
+    if (Object.keys(query_object).length > 0) {
+      var similar_users = await User.find({
+        $or: [
+          { interests: { $in: req.user.interests } },
+          { diseases: { $in: req.user.diseases } },
+          {
+            gender: req.user.gender,
+          },
+          {
+            status: req.user.status,
+          },
+        ],
+      }).select("-password");
 
-    cluster_users = Array.from(new Set(cluster_users.map((a) => a._id))).map(
-      (id) => {
-        return cluster_users.find((a) => a._id === id);
-      }
-    );
+      console.log({
+        similar_users,
+      });
+
+      cluster_users = cluster_users.concat(similar_users);
+
+      console.log(cluster_users.length);
+
+      cluster_users = Array.from(new Set(cluster_users.map((a) => a._id))).map(
+        (id) => {
+          return cluster_users.find((a) => a._id === id);
+        }
+      );
+    }
 
     res.status(200).json({
       code: 200,
