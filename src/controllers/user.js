@@ -532,13 +532,13 @@ const feed = async (req, res) => {
     var disease_by_users = [];
 
     if (
-      req.user.gemder != "" &&
-      req.user.gemder != null &&
-      req.user.gemder != undefined
+      req.user.gender != "" &&
+      req.user.gender != null &&
+      req.user.gender != undefined
     ) {
       console.log("here in gender");
       gender_by_users = await User.find({
-        gender: req.user.gemder,
+        gender: req.user.gender,
       }).select("-password");
     } else if (
       req.user.status != "" &&
