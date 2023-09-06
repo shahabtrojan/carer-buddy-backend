@@ -139,9 +139,9 @@ const get_profile = async (req, res) => {
     };
     var predictions = await predict(data_to_pass);
     console.log(predictions);
-    // user.cluster_id = predictions[0];
-    // console.log(user);
-    // user = await user.save();
+    user.cluster_id = predictions[0];
+    console.log(user);
+    user = await user.save();
     // }
 
     return res.status(200).json({
