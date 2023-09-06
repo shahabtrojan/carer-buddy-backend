@@ -396,6 +396,9 @@ const feed = async (req, res) => {
               },
             },
           },
+          {
+            cluster_id: req.user.cluster_id,
+          },
         ],
       });
 
