@@ -51,6 +51,9 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    status: {
+      type: String,
+    },
 
     profile_completed: {
       type: Boolean,

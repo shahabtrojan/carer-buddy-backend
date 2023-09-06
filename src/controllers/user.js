@@ -134,7 +134,7 @@ const get_profile = async (req, res) => {
       disease_1: user.diseases[0] ?? "",
       disease_2: user.diseases[1] ?? "",
       disease_3: user.diseases[2] ?? "",
-      status: user.status ?? "single",
+      status: user.status ?? "",
       sex: user.gender ?? "m",
     };
     var predictions = await predict(data_to_pass);
