@@ -128,12 +128,12 @@ const get_profile = async (req, res) => {
     //     "interest_3": ""
     // }
     var data_to_pass = {
-      interest_1: user.interests[0] ?? "music",
-      interest_2: user.interests[1] ?? "music",
-      interest_3: user.interests[2] ?? "music",
-      disease_1: user.diseases[0] ?? "none",
-      disease_2: user.diseases[1] ?? "none",
-      disease_3: user.diseases[2] ?? "none",
+      interest_1: user.interests[0] ?? "",
+      interest_2: user.interests[1] ?? "",
+      interest_3: user.interests[2] ?? "",
+      disease_1: user.diseases[0] ?? "",
+      disease_2: user.diseases[1] ?? "",
+      disease_3: user.diseases[2] ?? "",
       status: user.status ?? "single",
       sex: user.gender ?? "m",
     };
