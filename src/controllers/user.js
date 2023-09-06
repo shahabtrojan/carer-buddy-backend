@@ -412,6 +412,27 @@ const feed = async (req, res) => {
 
     // get unique users
 
+    // get users with my same intrests or disense or gener or status
+
+    var similar_users = await User.find({
+      $or: [
+        { interests: { $in: req.user.interests } },
+        { diseases: { $in: req.user.diseases } },
+        {
+          gender: req.user.gender,
+        },
+        {
+          status: req.user.status,
+        },
+      ],
+    }).select("-password");
+
+    console.log({
+      similar_users,
+    });
+
+    cluster_users = cluster_users.concat(similar_users);
+
     console.log(cluster_users.length);
 
     cluster_users = cluster_users.filter(
