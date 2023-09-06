@@ -415,6 +415,7 @@ const feed = async (req, res) => {
     // get users with my same intrests or disense or gener or status
 
     var similar_users = await User.find({
+      _id: { $ne: req.user._id },
       $or: [
         { interests: { $in: req.user.interests } },
         { diseases: { $in: req.user.diseases } },
