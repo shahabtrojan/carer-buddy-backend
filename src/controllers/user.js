@@ -440,7 +440,11 @@ const feed = async (req, res) => {
 
       console.log(cluster_users.length);
 
-      cluster_users = new Set(cluster_users);
+      cluster_users = Array.from(new Set(cluster_users.map((a) => a._id))).map(
+        (id) => {
+          return cluster_users.find((a) => a._id === id);
+        }
+      );
     } else {
       cluster_users = [];
     }
